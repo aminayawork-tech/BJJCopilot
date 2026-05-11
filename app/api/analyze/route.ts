@@ -52,16 +52,69 @@ const SUPPORTED_IMAGE_TYPES = new Set([
   'image/webp',
 ]);
 
-const VIDEO_TYPES = new Set([
-  'video/mp4',
-  'video/quicktime',
-  'video/x-msvideo',
-  'video/x-matroska',
-  'video/webm',
-  'video/mpeg',
-]);
+
+interface VideoFrame {
+  data: string; // base64 JPEG
+  timestamp: number;
+}
+
+async function analyzeWithClaude(
+  client: Anthropic,
+  contentBlocks: Anthropic.MessageParam['content']
+): Promise<NextResponse> {
+  const response = await client.messages.create({
+    model: 'claude-opus-4-7',
+    max_tokens: 1024,
+    system: SYSTEM_PROMPT,
+    messages: [{ role: 'user', content: contentBlocks }],
+  });
+
+  const textBlock = response.content.find((block) => block.type === 'text');
+  if (!textBlock || textBlock.type !== 'text') {
+    return NextResponse.json({ error: 'No analysis returned from the AI. Please try again.' }, { status: 500 });
+  }
+  return NextResponse.json({ analysis: textBlock.text });
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    console.error('ANTHROPIC_API_KEY is not set');
+    return NextResponse.json({ error: 'Server configuration error. Please contact support.' }, { status: 500 });
+  }
+  const client = new Anthropic({ apiKey });
+
+  const contentType = request.headers.get('content-type') ?? '';
+
+  // --- Video path: JSON body with extracted frames ---
+  if (contentType.includes('application/json')) {
+    try {
+      const body = await request.json();
+      const frames: VideoFrame[] = body.frames;
+
+      if (!Array.isArray(frames) || frames.length === 0) {
+        return NextResponse.json({ error: 'No frames provided.' }, { status: 400 });
+      }
+
+      const imageBlocks: Anthropic.ImageBlockParam[] = frames.map((frame) => ({
+        type: 'image',
+        source: { type: 'base64', media_type: 'image/jpeg', data: frame.data },
+      }));
+
+      const timestampList = frames.map((f) => `${f.timestamp.toFixed(1)}s`).join(', ');
+      const textBlock: Anthropic.TextBlockParam = {
+        type: 'text',
+        text: `Analyze these ${frames.length} frames extracted from a BJJ video clip (timestamps: ${timestampList}). Reference the timestamps in your bullet points.`,
+      };
+
+      return analyzeWithClaude(client, [...imageBlocks, textBlock]);
+    } catch (err) {
+      console.error('Video frames parse error:', err);
+      return NextResponse.json({ error: 'Failed to process video frames.' }, { status: 400 });
+    }
+  }
+
+  // --- Image path: multipart form data ---
   try {
     const formData = await request.formData();
     const file = formData.get('file');
@@ -71,106 +124,37 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 10MB.' },
-        { status: 413 }
-      );
-    }
-
-    // Check if it's a video file
-    if (VIDEO_TYPES.has(file.type) || file.name.match(/\.(mp4|mov|avi|mkv|webm|mpeg|mpg)$/i)) {
-      return NextResponse.json(
-        {
-          error:
-            'Video files cannot be analyzed directly. Please take a screenshot or export a still frame from your video, then upload that image instead. JPEG, PNG, GIF, and WEBP images are supported.',
-        },
-        { status: 422 }
-      );
+      return NextResponse.json({ error: 'File too large. Maximum size is 10MB.' }, { status: 413 });
     }
 
     if (!SUPPORTED_IMAGE_TYPES.has(file.type)) {
       return NextResponse.json(
-        {
-          error:
-            `Unsupported file type: "${file.type}". Please upload a JPEG, PNG, GIF, or WEBP image.`,
-        },
+        { error: `Unsupported file type: "${file.type}". Please upload a JPEG, PNG, GIF, or WEBP image.` },
         { status: 415 }
-      );
-    }
-
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      console.error('ANTHROPIC_API_KEY is not set');
-      return NextResponse.json(
-        { error: 'Server configuration error. Please contact support.' },
-        { status: 500 }
       );
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
-    const client = new Anthropic({ apiKey });
-
-    const response = await client.messages.create({
-      model: 'claude-opus-4-7',
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: file.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
-                data: base64Data,
-              },
-            },
-            {
-              type: 'text',
-              text: 'Analyze this BJJ image and provide coaching feedback.',
-            },
-          ],
+    return analyzeWithClaude(client, [
+      {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: file.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+          data: base64Data,
         },
-      ],
-    });
-
-    const textBlock = response.content.find((block) => block.type === 'text');
-    if (!textBlock || textBlock.type !== 'text') {
-      return NextResponse.json(
-        { error: 'No analysis returned from the AI. Please try again.' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ analysis: textBlock.text });
+      },
+      { type: 'text', text: 'Analyze this BJJ image and provide coaching feedback.' },
+    ]);
   } catch (err: unknown) {
     console.error('Analyze API error:', err);
-
     if (err instanceof Anthropic.APIError) {
-      if (err.status === 401) {
-        return NextResponse.json(
-          { error: 'Invalid API key. Please check server configuration.' },
-          { status: 500 }
-        );
-      }
-      if (err.status === 429) {
-        return NextResponse.json(
-          { error: 'Rate limit exceeded. Please wait a moment and try again.' },
-          { status: 429 }
-        );
-      }
-      return NextResponse.json(
-        { error: 'AI service error. Please try again.' },
-        { status: 502 }
-      );
+      if (err.status === 401) return NextResponse.json({ error: 'Invalid API key. Please check server configuration.' }, { status: 500 });
+      if (err.status === 429) return NextResponse.json({ error: 'Rate limit exceeded. Please wait a moment and try again.' }, { status: 429 });
+      return NextResponse.json({ error: 'AI service error. Please try again.' }, { status: 502 });
     }
-
-    return NextResponse.json(
-      { error: 'An unexpected error occurred. Please try again.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'An unexpected error occurred. Please try again.' }, { status: 500 });
   }
 }

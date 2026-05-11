@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import UploadZone from '@/components/UploadZone';
+import UploadZone, { AnalyzePayload } from '@/components/UploadZone';
 import AnalysisResult from '@/components/AnalysisResult';
 import LoadingState from '@/components/LoadingState';
 
@@ -12,32 +12,42 @@ export default function Home() {
   const [analysis, setAnalysis] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const handleAnalyze = async (file: File) => {
+  const handleAnalyze = async (payload: AnalyzePayload) => {
     setAppState('loading');
     setAnalysis('');
     setErrorMessage('');
 
-    const formData = new FormData();
-    formData.append('file', file);
+    let response: Response;
+    try {
+      if (payload.type === 'image') {
+        const formData = new FormData();
+        formData.append('file', payload.file);
+        response = await fetch('/api/analyze', { method: 'POST', body: formData });
+      } else {
+        response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ frames: payload.frames, filename: payload.filename }),
+        });
+      }
+    } catch {
+      setErrorMessage('Network error. Please check your connection and try again.');
+      setAppState('error');
+      return;
+    }
 
     try {
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        body: formData,
-      });
 
       const data = await response.json();
-
       if (!response.ok || data.error) {
         setErrorMessage(data.error ?? 'Something went wrong. Please try again.');
         setAppState('error');
         return;
       }
-
       setAnalysis(data.analysis);
       setAppState('result');
     } catch {
-      setErrorMessage('Network error. Please check your connection and try again.');
+      setErrorMessage('Failed to parse server response. Please try again.');
       setAppState('error');
     }
   };
