@@ -91,6 +91,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     try {
       const body = await request.json();
       const frames: VideoFrame[] = body.frames;
+      const userDescription: string = body.userDescription ?? '';
 
       if (!Array.isArray(frames) || frames.length === 0) {
         return NextResponse.json({ error: 'No frames provided.' }, { status: 400 });
@@ -102,9 +103,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }));
 
       const timestampList = frames.map((f) => `${f.timestamp.toFixed(1)}s`).join(', ');
+      const whoAmI = userDescription
+        ? `The athlete seeking feedback is ${userDescription}. Focus ALL coaching feedback on that person.`
+        : 'Identify who is likely the one seeking feedback based on context if possible.';
       const textBlock: Anthropic.TextBlockParam = {
         type: 'text',
-        text: `Analyze these ${frames.length} frames extracted from a BJJ video clip (timestamps: ${timestampList}). Reference the timestamps in your bullet points.`,
+        text: `Analyze these ${frames.length} frames extracted from a BJJ video clip (timestamps: ${timestampList}). ${whoAmI} Reference the timestamps in your bullet points.`,
       };
 
       return analyzeWithClaude(client, [...imageBlocks, textBlock]);
@@ -136,6 +140,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const arrayBuffer = await file.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString('base64');
+    const userDescription: string = (formData.get('userDescription') as string) ?? '';
+    const whoAmI = userDescription
+      ? `The athlete seeking feedback is ${userDescription}. Focus ALL coaching feedback on that person.`
+      : 'Identify who is likely the one seeking feedback based on context if possible.';
 
     return analyzeWithClaude(client, [
       {
@@ -146,7 +154,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           data: base64Data,
         },
       },
-      { type: 'text', text: 'Analyze this BJJ image and provide coaching feedback.' },
+      { type: 'text', text: `Analyze this BJJ image and provide coaching feedback. ${whoAmI}` },
     ]);
   } catch (err: unknown) {
     console.error('Analyze API error:', err);

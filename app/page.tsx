@@ -22,12 +22,13 @@ export default function Home() {
       if (payload.type === 'image') {
         const formData = new FormData();
         formData.append('file', payload.file);
+        formData.append('userDescription', payload.userDescription);
         response = await fetch('/api/analyze', { method: 'POST', body: formData });
       } else {
         response = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ frames: payload.frames, filename: payload.filename }),
+          body: JSON.stringify({ frames: payload.frames, filename: payload.filename, userDescription: payload.userDescription }),
         });
       }
     } catch {

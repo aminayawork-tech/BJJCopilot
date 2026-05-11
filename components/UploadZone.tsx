@@ -8,8 +8,8 @@ export interface VideoFrame {
 }
 
 export type AnalyzePayload =
-  | { type: 'image'; file: File }
-  | { type: 'video'; frames: VideoFrame[]; filename: string };
+  | { type: 'image'; file: File; userDescription: string }
+  | { type: 'video'; frames: VideoFrame[]; filename: string; userDescription: string };
 
 interface UploadZoneProps {
   onAnalyze: (payload: AnalyzePayload) => void;
@@ -93,7 +93,22 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [selectedChip, setSelectedChip] = useState<string>('');
+  const [customDescription, setCustomDescription] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const CHIPS = [
+    { label: 'On Top', value: 'the person on top' },
+    { label: 'On Bottom', value: 'the person on bottom' },
+    { label: 'Blue/Dark Gi', value: 'the person wearing the blue or dark gi' },
+    { label: 'White Gi', value: 'the person wearing the white gi' },
+    { label: 'Left Side', value: 'the person on the left side of the frame' },
+    { label: 'Right Side', value: 'the person on the right side of the frame' },
+  ];
+
+  const userDescription = customDescription.trim()
+    ? customDescription.trim()
+    : selectedChip;
 
   const validateAndSetFile = useCallback((file: File) => {
     setValidationError(null);
@@ -135,6 +150,8 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
     setPreviewUrl(null);
     setFileIsVideo(false);
     setValidationError(null);
+    setSelectedChip('');
+    setCustomDescription('');
     if (inputRef.current) inputRef.current.value = '';
   };
 
@@ -145,13 +162,13 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
       setIsExtracting(true);
       try {
         const frames = await extractFrames(selectedFile);
-        onAnalyze({ type: 'video', frames, filename: selectedFile.name });
+        onAnalyze({ type: 'video', frames, filename: selectedFile.name, userDescription });
       } catch (err) {
         setValidationError(err instanceof Error ? err.message : 'Failed to process video.');
         setIsExtracting(false);
       }
     } else {
-      onAnalyze({ type: 'image', file: selectedFile });
+      onAnalyze({ type: 'image', file: selectedFile, userDescription });
     }
   };
 
@@ -276,6 +293,52 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
               </svg>
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Who are you selector — shown once a file is picked */}
+      {selectedFile && (
+        <div className="rounded-xl border p-4 flex flex-col gap-3" style={{ backgroundColor: '#141414', borderColor: '#262626' }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#a3a3a3' }}>
+            Which person are you?
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {CHIPS.map((chip) => {
+              const active = selectedChip === chip.value && !customDescription.trim();
+              return (
+                <button
+                  key={chip.value}
+                  type="button"
+                  onClick={() => { setSelectedChip(active ? '' : chip.value); setCustomDescription(''); }}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150"
+                  style={{
+                    backgroundColor: active ? '#dc2626' : '#1f1f1f',
+                    borderColor: active ? '#dc2626' : '#3f3f3f',
+                    color: active ? '#fff' : '#a3a3a3',
+                  }}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+          <input
+            type="text"
+            placeholder='Or describe yourself… e.g. "the taller guy" or "wearing rash guard"'
+            value={customDescription}
+            onChange={(e) => { setCustomDescription(e.target.value); if (e.target.value) setSelectedChip(''); }}
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none border transition-colors duration-150"
+            style={{
+              backgroundColor: '#0a0a0a',
+              borderColor: customDescription ? '#dc2626' : '#3f3f3f',
+              color: '#f5f5f5',
+            }}
+          />
+          {!userDescription && (
+            <p className="text-xs" style={{ color: '#525252' }}>
+              Skipping this — AI will make its best guess
+            </p>
+          )}
         </div>
       )}
 
