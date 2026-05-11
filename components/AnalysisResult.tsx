@@ -1,8 +1,12 @@
 'use client';
 
+import { useState } from 'react';
+
 interface AnalysisResultProps {
   analysis: string;
   onReset: () => void;
+  onSave?: () => void;
+  savedConfirmed?: boolean;
 }
 
 interface ParsedBullet {
@@ -59,7 +63,15 @@ function parseBullets(text: string): ParsedBullet[] {
   return bullets;
 }
 
-export default function AnalysisResult({ analysis, onReset }: AnalysisResultProps) {
+export default function AnalysisResult({ analysis, onReset, onSave, savedConfirmed }: AnalysisResultProps) {
+  const [localSaved, setLocalSaved] = useState(false);
+  const isSaved = savedConfirmed || localSaved;
+
+  const handleSave = () => {
+    onSave?.();
+    setLocalSaved(true);
+  };
+
   const bullets = parseBullets(analysis);
 
   // Separate quick wins from regular bullets
@@ -129,6 +141,22 @@ export default function AnalysisResult({ analysis, onReset }: AnalysisResultProp
 
       {/* Divider */}
       <div className="h-px" style={{ backgroundColor: '#262626' }} />
+
+      {/* Save Review button */}
+      {onSave && (
+        <button
+          onClick={handleSave}
+          disabled={isSaved}
+          className="w-full py-3 rounded-lg font-bold text-sm tracking-widest uppercase transition-all duration-150 border"
+          style={
+            isSaved
+              ? { backgroundColor: 'transparent', borderColor: '#3f3f3f', color: '#525252', cursor: 'default' }
+              : { backgroundColor: 'transparent', borderColor: '#dc2626', color: '#dc2626' }
+          }
+        >
+          {isSaved ? '✓ Review Saved' : 'Save Review'}
+        </button>
+      )}
 
       {/* Analyze another button */}
       <button
