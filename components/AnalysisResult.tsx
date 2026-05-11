@@ -183,12 +183,22 @@ function ReviewChat({ analysis }: { analysis: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const messagesRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    }
   }, [messages, isLoading]);
+
+  // Lock scroll root when maximized
+  useEffect(() => {
+    const root = document.getElementById('app-scroll-root');
+    if (root) root.style.overflow = isMaximized ? 'hidden' : '';
+    return () => { if (root) root.style.overflow = ''; };
+  }, [isMaximized]);
 
   const send = async () => {
     const text = input.trim();
@@ -217,61 +227,48 @@ function ReviewChat({ analysis }: { analysis: string }) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   };
 
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Section label */}
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
-        <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#a3a3a3' }}>
-          Discuss This Roll
-        </span>
-        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
-      </div>
-
-      {/* Chat box */}
-      <div className="rounded-lg border flex flex-col overflow-hidden" style={{ backgroundColor: '#0f0f0f', borderColor: '#262626', height: 360 }}>
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ overscrollBehavior: 'contain' }}>
-          {messages.length === 0 && !isLoading && (
-            <div className="flex flex-col items-center justify-center h-full text-center gap-2">
-              <p className="text-sm font-semibold" style={{ color: '#f5f5f5' }}>Ask about your roll</p>
-              <p className="text-xs" style={{ color: '#525252' }}>
-                "Why did I lose that position?" · "How do I drill the seatbelt?" · "What's the escape from that spot?"
-              </p>
-            </div>
-          )}
-          {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className="max-w-[82%] rounded-2xl px-4 py-2.5 leading-relaxed whitespace-pre-wrap"
-                style={{
-                  fontSize: 15,
-                  ...(msg.role === 'user'
-                    ? { backgroundColor: '#dc2626', color: '#fff', borderBottomRightRadius: 4 }
-                    : { backgroundColor: '#1f1f1f', color: '#f5f5f5', borderBottomLeftRadius: 4 }),
-                }}
-              >
-                {msg.content}
-              </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="rounded-2xl px-4 py-3 flex gap-1 items-center" style={{ backgroundColor: '#1f1f1f', borderBottomLeftRadius: 4 }}>
-                {[0, 1, 2].map((d) => (
-                  <span key={d} className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#525252', animation: `reviewBounce 1s infinite ${d * 0.2}s` }} />
-                ))}
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
+  const messagesBubbles = (
+    <>
+      {messages.length === 0 && !isLoading && (
+        <div className="flex flex-col items-center justify-center h-full text-center gap-2">
+          <p className="text-sm font-semibold" style={{ color: '#f5f5f5' }}>Ask about your roll</p>
+          <p className="text-xs" style={{ color: '#525252' }}>
+            "Why did I lose that position?" · "How do I drill the seatbelt?" · "What's the escape from that spot?"
+          </p>
         </div>
+      )}
+      {messages.map((msg, i) => (
+        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div
+            className="max-w-[82%] rounded-2xl px-4 py-2.5 leading-relaxed whitespace-pre-wrap"
+            style={{
+              fontSize: 15,
+              ...(msg.role === 'user'
+                ? { backgroundColor: '#dc2626', color: '#fff', borderBottomRightRadius: 4 }
+                : { backgroundColor: '#1f1f1f', color: '#f5f5f5', borderBottomLeftRadius: 4 }),
+            }}
+          >
+            {msg.content}
+          </div>
+        </div>
+      ))}
+      {isLoading && (
+        <div className="flex justify-start">
+          <div className="rounded-2xl px-4 py-3 flex gap-1 items-center" style={{ backgroundColor: '#1f1f1f', borderBottomLeftRadius: 4 }}>
+            {[0, 1, 2].map((d) => (
+              <span key={d} className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#525252', animation: `reviewBounce 1s infinite ${d * 0.2}s` }} />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
 
-        {/* Input */}
-        <div className="border-t p-3 flex gap-2 items-end" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
-          <textarea
-            ref={inputRef}
-            rows={1}
+  const inputBar = (
+    <div className="border-t p-3 flex gap-2 items-end" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
+      <textarea
+        ref={inputRef}
+        rows={1}
             value={input}
             onChange={(e) => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'; }}
             onKeyDown={onKeyDown}
@@ -288,6 +285,53 @@ function ReviewChat({ analysis }: { analysis: string }) {
             </svg>
           </button>
         </div>
+  );
+
+  return (
+    <>
+      {/* Maximized overlay */}
+      {isMaximized && (
+        <div className="fixed inset-0 flex flex-col z-50" style={{ backgroundColor: '#0a0a0a' }}>
+          <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
+            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#f5f5f5' }}>Discuss This Roll</span>
+            <button onClick={() => setIsMaximized(false)} className="p-2 rounded-lg" style={{ color: '#a3a3a3' }} aria-label="Minimize">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5M15 15l5.25 5.25M9 15H4.5M9 15v4.5M9 15l-5.25 5.25" />
+              </svg>
+            </button>
+          </div>
+          <div ref={messagesRef} className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ overscrollBehavior: 'contain' }}>
+            {messagesBubbles}
+          </div>
+          {inputBar}
+        </div>
+      )}
+
+      {/* Inline section */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#a3a3a3' }}>Discuss This Roll</span>
+          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
+        </div>
+
+        <div className="rounded-lg border flex flex-col overflow-hidden" style={{ backgroundColor: '#0f0f0f', borderColor: '#262626', height: 360 }}>
+          {/* Header with maximize */}
+          <div className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
+            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#a3a3a3' }}>
+              {messages.filter(m => m.role === 'user').length > 0 ? `${messages.filter(m => m.role === 'user').length} question${messages.filter(m => m.role === 'user').length !== 1 ? 's' : ''}` : 'Chat'}
+            </span>
+            <button onClick={() => setIsMaximized(true)} className="p-1.5 rounded" style={{ color: '#a3a3a3' }} aria-label="Maximize chat">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
+            </button>
+          </div>
+          <div ref={messagesRef} className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ overscrollBehavior: 'contain' }}>
+            {messagesBubbles}
+          </div>
+          {inputBar}
+        </div>
       </div>
 
       <style>{`
@@ -296,7 +340,7 @@ function ReviewChat({ analysis }: { analysis: string }) {
           40% { transform: translateY(-5px); opacity: 1; }
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

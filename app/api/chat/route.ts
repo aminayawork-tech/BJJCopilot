@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-const BASE_SYSTEM_PROMPT = `You are a BJJ black belt instructor with 20+ years of experience. Answer questions about Brazilian Jiu-Jitsu techniques, positions, escapes, submissions, and training concepts. Be specific, practical, and concise. Use standard BJJ terminology. Focus on high-percentage fundamentals over advanced or low-percentage techniques. Format responses with clear structure when listing steps or options — use numbered lists or bullet points. Keep answers tight — no motivational filler.`;
+const BASE_SYSTEM_PROMPT = `You are a BJJ black belt instructor with 20+ years of experience. Answer questions about Brazilian Jiu-Jitsu techniques, positions, escapes, submissions, and training concepts. Be specific, practical, and concise. Use standard BJJ terminology. Focus on high-percentage fundamentals over advanced or low-percentage techniques. Keep answers tight — no motivational filler.
+
+IMPORTANT FORMATTING RULES: Write in plain text only. No markdown. No asterisks, no underscores, no pound signs, no backticks. For lists use simple numbering like "1." "2." or start lines with a dash and space. Separate paragraphs with a blank line.`;
 
 function buildSystemPrompt(analysisContext?: string): string {
   if (!analysisContext) return BASE_SYSTEM_PROMPT;

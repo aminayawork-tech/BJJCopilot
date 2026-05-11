@@ -174,11 +174,13 @@ function ChatSection() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    }
   }, [messages, isLoading]);
 
   // Lock body scroll when maximized
@@ -237,6 +239,7 @@ function ChatSection() {
     <>
       {/* Messages area */}
       <div
+        ref={messagesRef}
         className="flex-1 overflow-y-auto p-4 flex flex-col gap-3"
         style={{ overscrollBehavior: 'contain' }}
       >
@@ -283,7 +286,6 @@ function ChatSection() {
             </div>
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       {/* Input bar */}
