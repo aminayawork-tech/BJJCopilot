@@ -182,14 +182,12 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl" aria-hidden="true">🥋</span>
               <h1
                 className="text-3xl font-black tracking-widest uppercase"
                 style={{ color: '#dc2626' }}
               >
                 BJJ Copilot
               </h1>
-              <span className="text-3xl" aria-hidden="true">🥋</span>
             </div>
             <p className="text-sm font-medium tracking-widest uppercase" style={{ color: '#a3a3a3' }}>
               AI-Powered Grappling Coach
@@ -259,7 +257,11 @@ export default function Home() {
                 className="rounded-lg border p-6 text-center"
                 style={{ backgroundColor: '#141414', borderColor: '#dc2626' }}
               >
-                <div className="text-4xl mb-4" aria-hidden="true">⚠️</div>
+                <div className="flex justify-center mb-4" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="#dc2626" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                </div>
                 <h2 className="text-lg font-bold mb-2" style={{ color: '#f5f5f5' }}>
                   Analysis Failed
                 </h2>
