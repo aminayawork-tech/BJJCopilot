@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface AnalysisResultProps {
   analysis: string;
@@ -168,9 +168,139 @@ export default function AnalysisResult({ analysis, onReset, onSave, savedConfirm
       >
         Analyze Another
       </button>
+
+      {/* Discuss this roll */}
+      <ReviewChat analysis={analysis} />
     </div>
   );
 }
+
+// ── Review Chat ────────────────────────────────────────────────────────────
+
+interface ChatMessage { role: 'user' | 'assistant'; content: string; }
+
+function ReviewChat({ analysis }: { analysis: string }) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
+
+  const send = async () => {
+    const text = input.trim();
+    if (!text || isLoading) return;
+    const next: ChatMessage[] = [...messages, { role: 'user', content: text }];
+    setMessages(next);
+    setInput('');
+    if (inputRef.current) inputRef.current.style.height = 'auto';
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: next, analysisContext: analysis }),
+      });
+      const data = await res.json();
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply ?? data.error ?? 'Something went wrong.' }]);
+    } catch {
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'Network error. Please try again.' }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Section label */}
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
+        <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#a3a3a3' }}>
+          Discuss This Roll
+        </span>
+        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
+      </div>
+
+      {/* Chat box */}
+      <div className="rounded-lg border flex flex-col overflow-hidden" style={{ backgroundColor: '#0f0f0f', borderColor: '#262626', height: 360 }}>
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ overscrollBehavior: 'contain' }}>
+          {messages.length === 0 && !isLoading && (
+            <div className="flex flex-col items-center justify-center h-full text-center gap-2">
+              <p className="text-sm font-semibold" style={{ color: '#f5f5f5' }}>Ask about your roll</p>
+              <p className="text-xs" style={{ color: '#525252' }}>
+                "Why did I lose that position?" · "How do I drill the seatbelt?" · "What's the escape from that spot?"
+              </p>
+            </div>
+          )}
+          {messages.map((msg, i) => (
+            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className="max-w-[82%] rounded-2xl px-4 py-2.5 leading-relaxed whitespace-pre-wrap"
+                style={{
+                  fontSize: 15,
+                  ...(msg.role === 'user'
+                    ? { backgroundColor: '#dc2626', color: '#fff', borderBottomRightRadius: 4 }
+                    : { backgroundColor: '#1f1f1f', color: '#f5f5f5', borderBottomLeftRadius: 4 }),
+                }}
+              >
+                {msg.content}
+              </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="rounded-2xl px-4 py-3 flex gap-1 items-center" style={{ backgroundColor: '#1f1f1f', borderBottomLeftRadius: 4 }}>
+                {[0, 1, 2].map((d) => (
+                  <span key={d} className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#525252', animation: `reviewBounce 1s infinite ${d * 0.2}s` }} />
+                ))}
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input */}
+        <div className="border-t p-3 flex gap-2 items-end" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
+          <textarea
+            ref={inputRef}
+            rows={1}
+            value={input}
+            onChange={(e) => { setInput(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'; }}
+            onKeyDown={onKeyDown}
+            placeholder="Ask about this roll…"
+            className="flex-1 resize-none rounded-lg px-3 py-2 outline-none border transition-colors duration-150 overflow-hidden"
+            style={{ backgroundColor: '#0a0a0a', borderColor: input ? '#dc2626' : '#3f3f3f', color: '#f5f5f5', fontSize: 16, minHeight: 40, maxHeight: 100 }}
+            disabled={isLoading}
+          />
+          <button onClick={send} disabled={!input.trim() || isLoading}
+            className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg transition-opacity duration-150 disabled:opacity-40"
+            style={{ backgroundColor: '#dc2626' }} aria-label="Send">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.269 20.876L5.999 12zm0 0h7.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes reviewBounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+          40% { transform: translateY(-5px); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ── Bullet Card ─────────────────────────────────────────────────────────────
 
 function BulletCard({
   bullet,

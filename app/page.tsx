@@ -205,7 +205,10 @@ export default function Home() {
                   key={tab.id}
                   role="tab"
                   aria-selected={isActive}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    document.getElementById('app-scroll-root')?.scrollTo({ top: 0, behavior: 'instant' });
+                  }}
                   className="px-4 py-2.5 text-sm font-semibold rounded-t-lg transition-colors duration-150 relative"
                   style={{
                     color: isActive ? '#dc2626' : '#a3a3a3',
@@ -291,12 +294,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="mt-auto py-6 text-center" style={{ color: '#a3a3a3' }}>
-        <p className="text-xs tracking-wide uppercase">
-          Powered by Claude AI &mdash; For training purposes only
-        </p>
-      </footer>
     </main>
   );
 }
