@@ -411,6 +411,11 @@ function ChatSection() {
 }
 
 export default function LearningCenter() {
+  useEffect(() => {
+    const root = document.getElementById('app-scroll-root');
+    if (root) root.scrollTop = 0;
+  }, []);
+
   return (
     <div className="flex flex-col gap-0">
       <GlossarySection />

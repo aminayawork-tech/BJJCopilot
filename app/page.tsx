@@ -124,6 +124,9 @@ export default function Home() {
         payload,
       });
       setAppState('result');
+      // Scroll to top so user sees the breakdown first, not the chat
+      const root = document.getElementById('app-scroll-root');
+      if (root) root.scrollTop = 0;
     } catch {
       setErrorMessage('Failed to parse server response. Please try again.');
       setAppState('error');
@@ -207,7 +210,9 @@ export default function Home() {
                   aria-selected={isActive}
                   onClick={() => {
                     setActiveTab(tab.id);
-                    document.getElementById('app-scroll-root')?.scrollTo({ top: 0, behavior: 'instant' });
+                    // Direct scrollTop assignment — more reliable than scrollTo() on iOS Safari
+                    const root = document.getElementById('app-scroll-root');
+                    if (root) root.scrollTop = 0;
                   }}
                   className="px-4 py-2.5 text-sm font-semibold rounded-t-lg transition-colors duration-150 relative"
                   style={{
