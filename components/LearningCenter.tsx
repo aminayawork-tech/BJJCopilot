@@ -55,11 +55,12 @@ function GlossarySection() {
           placeholder="Search terms, categories, or definitions…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-lg pl-9 pr-4 py-2.5 text-sm outline-none border transition-colors duration-150"
+          className="w-full rounded-lg pl-9 pr-4 py-2.5 outline-none border transition-colors duration-150"
           style={{
             backgroundColor: '#141414',
             borderColor: query ? '#dc2626' : '#262626',
             color: '#f5f5f5',
+            fontSize: 16,
           }}
         />
       </div>
@@ -101,12 +102,24 @@ function ChatSection() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  // Lock body scroll when maximized
+  useEffect(() => {
+    const scrollRoot = document.getElementById('app-scroll-root');
+    if (isMaximized && scrollRoot) {
+      scrollRoot.style.overflow = 'hidden';
+    } else if (scrollRoot) {
+      scrollRoot.style.overflow = '';
+    }
+    return () => { if (scrollRoot) scrollRoot.style.overflow = ''; };
+  }, [isMaximized]);
 
   const sendMessage = async () => {
     const text = input.trim();
@@ -115,6 +128,10 @@ function ChatSection() {
     const newMessages: Message[] = [...messages, { role: 'user', content: text }];
     setMessages(newMessages);
     setInput('');
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
     setIsLoading(true);
 
     try {
@@ -124,14 +141,10 @@ function ChatSection() {
         body: JSON.stringify({ messages: newMessages }),
       });
       const data = await res.json();
-      if (data.reply) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: data.error ?? 'Something went wrong. Please try again.' },
-        ]);
-      }
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: data.reply ?? data.error ?? 'Something went wrong.' },
+      ]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -149,130 +162,178 @@ function ChatSection() {
     }
   };
 
-  return (
-    <div className="mt-10">
-      {/* Divider */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
-        <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#a3a3a3' }}>
-          Ask the Coach
-        </span>
-        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
-      </div>
-
-      {/* Chat container */}
+  const chatContent = (
+    <>
+      {/* Messages area */}
       <div
-        className="rounded-lg border overflow-hidden flex flex-col"
-        style={{ backgroundColor: '#0f0f0f', borderColor: '#262626', minHeight: 360 }}
+        className="flex-1 overflow-y-auto p-4 flex flex-col gap-3"
+        style={{ overscrollBehavior: 'contain' }}
       >
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ maxHeight: 420 }}>
-          {messages.length === 0 && !isLoading && (
-            <div className="flex flex-col items-center justify-center h-full py-10 text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke="#525252" strokeWidth={1.5} aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-              </svg>
-              <p className="text-sm font-semibold mb-1" style={{ color: '#f5f5f5' }}>
-                Ask your coach anything
-              </p>
-              <p className="text-xs" style={{ color: '#525252' }}>
-                Techniques, escapes, positions, game plans…
-              </p>
-            </div>
-          )}
+        {messages.length === 0 && !isLoading && (
+          <div className="flex flex-col items-center justify-center h-full py-10 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke="#525252" strokeWidth={1.5} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+            </svg>
+            <p className="text-sm font-semibold mb-1" style={{ color: '#f5f5f5' }}>Ask your coach anything</p>
+            <p className="text-xs" style={{ color: '#525252' }}>Techniques, escapes, positions, game plans…</p>
+          </div>
+        )}
 
-          {messages.map((msg, i) => (
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
-              key={i}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className="max-w-[80%] rounded-2xl px-4 py-2.5 leading-relaxed whitespace-pre-wrap"
+              style={{
+                fontSize: 15,
+                ...(msg.role === 'user'
+                  ? { backgroundColor: '#dc2626', color: '#fff', borderBottomRightRadius: 4 }
+                  : { backgroundColor: '#1f1f1f', color: '#f5f5f5', borderBottomLeftRadius: 4 }),
+              }}
             >
-              <div
-                className="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap"
-                style={
-                  msg.role === 'user'
-                    ? { backgroundColor: '#dc2626', color: '#fff', borderBottomRightRadius: 4 }
-                    : { backgroundColor: '#1f1f1f', color: '#f5f5f5', borderBottomLeftRadius: 4 }
-                }
-              >
-                {msg.content}
-              </div>
+              {msg.content}
             </div>
-          ))}
+          </div>
+        ))}
 
-          {/* Typing indicator */}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div
-                className="rounded-2xl px-4 py-3 flex gap-1 items-center"
-                style={{ backgroundColor: '#1f1f1f', borderBottomLeftRadius: 4 }}
-                aria-label="Coach is typing"
-              >
-                {[0, 1, 2].map((dot) => (
-                  <span
-                    key={dot}
-                    className="inline-block w-2 h-2 rounded-full"
-                    style={{
-                      backgroundColor: '#525252',
-                      animation: `bounce 1s infinite ${dot * 0.2}s`,
-                    }}
-                  />
-                ))}
-              </div>
+        {isLoading && (
+          <div className="flex justify-start">
+            <div
+              className="rounded-2xl px-4 py-3 flex gap-1 items-center"
+              style={{ backgroundColor: '#1f1f1f', borderBottomLeftRadius: 4 }}
+              aria-label="Coach is typing"
+            >
+              {[0, 1, 2].map((dot) => (
+                <span
+                  key={dot}
+                  className="inline-block w-2 h-2 rounded-full"
+                  style={{ backgroundColor: '#525252', animation: `chatBounce 1s infinite ${dot * 0.2}s` }}
+                />
+              ))}
             </div>
-          )}
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
 
-          <div ref={bottomRef} />
+      {/* Input bar */}
+      <div
+        className="border-t p-3 flex gap-2 items-end"
+        style={{ borderColor: '#262626', backgroundColor: '#141414' }}
+      >
+        <textarea
+          ref={inputRef}
+          rows={1}
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+          }}
+          onKeyDown={handleKeyDown}
+          placeholder="Ask about a technique, position, escape…"
+          className="flex-1 resize-none rounded-lg px-3 py-2 outline-none border transition-colors duration-150 overflow-hidden"
+          style={{
+            backgroundColor: '#0a0a0a',
+            borderColor: input ? '#dc2626' : '#3f3f3f',
+            color: '#f5f5f5',
+            fontSize: 16,
+            minHeight: 40,
+            maxHeight: 120,
+          }}
+          disabled={isLoading}
+        />
+        <button
+          onClick={sendMessage}
+          disabled={!input.trim() || isLoading}
+          className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg transition-opacity duration-150 disabled:opacity-40"
+          style={{ backgroundColor: '#dc2626' }}
+          aria-label="Send message"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.269 20.876L5.999 12zm0 0h7.5" />
+          </svg>
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Maximized overlay */}
+      {isMaximized && (
+        <div
+          className="fixed inset-0 flex flex-col z-50"
+          style={{ backgroundColor: '#0a0a0a' }}
+        >
+          {/* Overlay header */}
+          <div
+            className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0"
+            style={{ borderColor: '#262626', backgroundColor: '#141414' }}
+          >
+            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#f5f5f5' }}>
+              Ask the Coach
+            </span>
+            <button
+              onClick={() => setIsMaximized(false)}
+              className="p-2 rounded-lg transition-colors duration-150"
+              style={{ color: '#a3a3a3' }}
+              aria-label="Minimize chat"
+            >
+              {/* Compress/minimize icon */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5M15 15l5.25 5.25M9 15H4.5M9 15v4.5M9 15l-5.25 5.25" />
+              </svg>
+            </button>
+          </div>
+          {chatContent}
+        </div>
+      )}
+
+      {/* Inline section (always rendered to preserve state) */}
+      <div className="mt-10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#a3a3a3' }}>
+            Ask the Coach
+          </span>
+          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
         </div>
 
-        {/* Input bar */}
         <div
-          className="border-t p-3 flex gap-2 items-end sticky bottom-0"
-          style={{ borderColor: '#262626', backgroundColor: '#141414' }}
+          className="rounded-lg border overflow-hidden flex flex-col"
+          style={{ backgroundColor: '#0f0f0f', borderColor: '#262626', height: 420 }}
         >
-          <textarea
-            ref={inputRef}
-            rows={1}
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              // auto-grow
-              e.target.style.height = 'auto';
-              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask about a technique, position, escape…"
-            className="flex-1 resize-none rounded-lg px-3 py-2 text-sm outline-none border transition-colors duration-150 overflow-hidden"
-            style={{
-              backgroundColor: '#0a0a0a',
-              borderColor: input ? '#dc2626' : '#3f3f3f',
-              color: '#f5f5f5',
-              minHeight: 40,
-              maxHeight: 120,
-            }}
-            disabled={isLoading}
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim() || isLoading}
-            className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg transition-opacity duration-150 disabled:opacity-40"
-            style={{ backgroundColor: '#dc2626' }}
-            aria-label="Send message"
+          {/* Chat header with maximize button */}
+          <div
+            className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0"
+            style={{ borderColor: '#262626', backgroundColor: '#141414' }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#fff" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.269 20.876L5.999 12zm0 0h7.5" />
-            </svg>
-          </button>
+            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#a3a3a3' }}>
+              {messages.length > 0 ? `${messages.filter(m => m.role === 'user').length} question${messages.filter(m => m.role === 'user').length !== 1 ? 's' : ''}` : 'Chat'}
+            </span>
+            <button
+              onClick={() => setIsMaximized(true)}
+              className="p-1.5 rounded transition-colors duration-150"
+              style={{ color: '#a3a3a3' }}
+              aria-label="Maximize chat"
+            >
+              {/* Expand icon */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
+            </button>
+          </div>
+          {chatContent}
         </div>
       </div>
 
-      {/* Bounce keyframe */}
       <style>{`
-        @keyframes bounce {
+        @keyframes chatBounce {
           0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
           40% { transform: translateY(-5px); opacity: 1; }
         }
       `}</style>
-    </div>
+    </>
   );
 }
 

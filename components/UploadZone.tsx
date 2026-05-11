@@ -332,6 +332,7 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
               backgroundColor: '#0a0a0a',
               borderColor: customDescription ? '#dc2626' : '#3f3f3f',
               color: '#f5f5f5',
+              fontSize: 16,
             }}
           />
           {!userDescription && (
