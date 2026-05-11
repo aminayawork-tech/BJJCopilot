@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { bjjTerms } from '@/lib/bjjTerms';
+import { bjjTerms, BJJTerm } from '@/lib/bjjTerms';
 
 // Category badge colors
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
@@ -25,9 +25,83 @@ function CategoryBadge({ category }: { category: string }) {
   );
 }
 
+// ---- Term Card ----
+function TermCard({ term, isOpen, onToggle }: { term: BJJTerm; isOpen: boolean; onToggle: () => void }) {
+  return (
+    <div
+      className="rounded-lg border flex flex-col overflow-hidden cursor-pointer transition-colors duration-150"
+      style={{ backgroundColor: '#141414', borderColor: isOpen ? '#dc2626' : '#262626' }}
+      onClick={onToggle}
+    >
+      {/* Card header — always visible */}
+      <div className="p-3 flex flex-col gap-1.5">
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-sm font-bold leading-snug" style={{ color: '#dc2626' }}>
+            {term.term}
+          </p>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4 flex-shrink-0 mt-0.5 transition-transform duration-200"
+            style={{ color: '#525252', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <CategoryBadge category={term.category} />
+      </div>
+
+      {/* Expanded content */}
+      {isOpen && (
+        <div
+          className="px-3 pb-3 flex flex-col gap-3 border-t"
+          style={{ borderColor: '#262626' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p className="text-xs leading-relaxed pt-3" style={{ color: '#a3a3a3' }}>
+            {term.definition}
+          </p>
+
+          {term.videos.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#525252' }}>
+                Watch on YouTube
+              </p>
+              {term.videos.map((v) => (
+                <a
+                  key={v.label}
+                  href={v.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 transition-opacity duration-150 hover:opacity-80"
+                  style={{ backgroundColor: '#1f1f1f', border: '1px solid #3f3f3f' }}
+                >
+                  {/* Play icon */}
+                  <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full" style={{ backgroundColor: '#dc2626' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="white">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                  <span className="text-xs font-medium" style={{ color: '#f5f5f5' }}>{v.label}</span>
+                  {/* External link icon */}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 ml-auto flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="#525252" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---- Glossary Section ----
 function GlossarySection() {
   const [query, setQuery] = useState('');
+  const [openTerm, setOpenTerm] = useState<string | null>(null);
+
   const filtered = bjjTerms.filter((t) => {
     const q = query.toLowerCase();
     return (
@@ -36,6 +110,10 @@ function GlossarySection() {
       t.definition.toLowerCase().includes(q)
     );
   });
+
+  const handleToggle = (term: string) => {
+    setOpenTerm((prev) => (prev === term ? null : term));
+  };
 
   return (
     <div>
@@ -54,7 +132,7 @@ function GlossarySection() {
           type="text"
           placeholder="Search terms, categories, or definitions…"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => { setQuery(e.target.value); setOpenTerm(null); }}
           className="w-full rounded-lg pl-9 pr-4 py-2.5 outline-none border transition-colors duration-150"
           style={{
             backgroundColor: '#141414',
@@ -72,19 +150,12 @@ function GlossarySection() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {filtered.map((term) => (
-            <div
+            <TermCard
               key={term.term}
-              className="rounded-lg border p-3 flex flex-col gap-1.5"
-              style={{ backgroundColor: '#141414', borderColor: '#262626' }}
-            >
-              <p className="text-sm font-bold leading-snug" style={{ color: '#dc2626' }}>
-                {term.term}
-              </p>
-              <CategoryBadge category={term.category} />
-              <p className="text-xs leading-relaxed mt-1" style={{ color: '#a3a3a3' }}>
-                {term.definition}
-              </p>
-            </div>
+              term={term}
+              isOpen={openTerm === term.term}
+              onToggle={() => handleToggle(term.term)}
+            />
           ))}
         </div>
       )}
