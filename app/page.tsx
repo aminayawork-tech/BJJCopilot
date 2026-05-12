@@ -198,8 +198,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tab navigation */}
-        <div className="max-w-4xl mx-auto px-4 pb-0">
+        {/* Top tab navigation — desktop only */}
+        <div className="hidden sm:block max-w-4xl mx-auto px-4 pb-0">
           <nav className="flex justify-center gap-1" role="tablist" aria-label="Main navigation">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -210,7 +210,6 @@ export default function Home() {
                   aria-selected={isActive}
                   onClick={() => {
                     setActiveTab(tab.id);
-                    // Direct scrollTop assignment — more reliable than scrollTo() on iOS Safari
                     const root = document.getElementById('app-scroll-root');
                     if (root) root.scrollTop = 0;
                   }}
@@ -237,8 +236,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main content */}
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      {/* Main content — extra bottom padding on mobile for bottom nav */}
+      <div className="max-w-2xl mx-auto px-4 py-10 sm:pb-10 pb-28">
 
         {/* Analyze Tab */}
         {activeTab === 'analyze' && (
@@ -299,6 +298,93 @@ export default function Home() {
         )}
       </div>
 
+      {/* Bottom nav — mobile only */}
+      <nav
+        className="sm:hidden fixed bottom-0 left-0 right-0 border-t flex"
+        style={{
+          backgroundColor: '#0a0a0a',
+          borderColor: '#262626',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          zIndex: 40,
+        }}
+        role="tablist"
+        aria-label="Main navigation"
+      >
+        {/* Analyze */}
+        <BottomNavItem
+          label="Analyze"
+          isActive={activeTab === 'analyze'}
+          onClick={() => { setActiveTab('analyze'); const r = document.getElementById('app-scroll-root'); if (r) r.scrollTop = 0; }}
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+          }
+        />
+        {/* Saved Reviews */}
+        <BottomNavItem
+          label="Saved"
+          isActive={activeTab === 'saved'}
+          badge={savedReviews.length}
+          onClick={() => { setActiveTab('saved'); const r = document.getElementById('app-scroll-root'); if (r) r.scrollTop = 0; }}
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+            </svg>
+          }
+        />
+        {/* Learning Center */}
+        <BottomNavItem
+          label="Learn"
+          isActive={activeTab === 'learn'}
+          onClick={() => { setActiveTab('learn'); const r = document.getElementById('app-scroll-root'); if (r) r.scrollTop = 0; }}
+          icon={
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+            </svg>
+          }
+        />
+      </nav>
     </main>
+  );
+}
+
+function BottomNavItem({
+  label,
+  isActive,
+  icon,
+  badge = 0,
+  onClick,
+}: {
+  label: string;
+  isActive: boolean;
+  icon: React.ReactNode;
+  badge?: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      role="tab"
+      aria-selected={isActive}
+      onClick={onClick}
+      className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-colors duration-150 relative"
+      style={{ color: isActive ? '#dc2626' : '#525252', backgroundColor: 'transparent' }}
+    >
+      <span className="relative">
+        {icon}
+        {badge > 0 && (
+          <span
+            className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 rounded-full text-white font-bold"
+            style={{ backgroundColor: '#dc2626', fontSize: '0.55rem' }}
+          >
+            {badge}
+          </span>
+        )}
+      </span>
+      <span className="text-xs font-semibold tracking-wide">{label}</span>
+      {isActive && (
+        <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full" style={{ backgroundColor: '#dc2626' }} />
+      )}
+    </button>
   );
 }
