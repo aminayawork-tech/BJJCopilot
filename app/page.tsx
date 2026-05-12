@@ -200,7 +200,7 @@ export default function Home() {
 
         {/* Tab navigation */}
         <div className="max-w-4xl mx-auto px-4 pb-0">
-          <nav className="flex gap-1" role="tablist" aria-label="Main navigation">
+          <nav className="flex justify-center gap-1" role="tablist" aria-label="Main navigation">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
