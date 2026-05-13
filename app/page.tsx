@@ -179,9 +179,9 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#0a0a0a' }}>
+    <main className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
       {/* Header */}
-      <header className="border-b" style={{ borderColor: '#262626' }}>
+      <header className="border-b" style={{ borderColor: '#e5e5e5', backgroundColor: '#ffffff' }}>
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center gap-3 mb-2">
@@ -192,7 +192,7 @@ export default function Home() {
                 BJJ Copilot
               </h1>
             </div>
-            <p className="text-sm font-medium tracking-widest uppercase" style={{ color: '#a3a3a3' }}>
+            <p className="text-sm font-medium tracking-widest uppercase" style={{ color: '#6b7280' }}>
               AI-Powered Grappling Coach
             </p>
           </div>
@@ -215,7 +215,7 @@ export default function Home() {
                   }}
                   className="px-4 py-2.5 text-sm font-semibold rounded-t-lg transition-colors duration-150 relative"
                   style={{
-                    color: isActive ? '#dc2626' : '#a3a3a3',
+                    color: isActive ? '#dc2626' : '#6b7280',
                     borderBottom: isActive ? '2px solid #dc2626' : '2px solid transparent',
                     backgroundColor: 'transparent',
                   }}
@@ -262,17 +262,17 @@ export default function Home() {
             {appState === 'error' && (
               <div
                 className="rounded-lg border p-6 text-center"
-                style={{ backgroundColor: '#141414', borderColor: '#dc2626' }}
+                style={{ backgroundColor: '#ffffff', borderColor: '#dc2626', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
               >
                 <div className="flex justify-center mb-4" aria-hidden="true">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="#dc2626" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                   </svg>
                 </div>
-                <h2 className="text-lg font-bold mb-2" style={{ color: '#f5f5f5' }}>
+                <h2 className="text-lg font-bold mb-2" style={{ color: '#111111' }}>
                   Analysis Failed
                 </h2>
-                <p className="mb-6" style={{ color: '#a3a3a3' }}>
+                <p className="mb-6" style={{ color: '#6b7280' }}>
                   {errorMessage}
                 </p>
                 <button
@@ -302,8 +302,8 @@ export default function Home() {
       <nav
         className="sm:hidden fixed bottom-0 left-0 right-0 border-t flex"
         style={{
-          backgroundColor: '#0a0a0a',
-          borderColor: '#262626',
+          backgroundColor: '#ffffff',
+          borderColor: '#e5e5e5',
           paddingBottom: 'env(safe-area-inset-bottom)',
           zIndex: 40,
         }}
@@ -368,7 +368,7 @@ function BottomNavItem({
       aria-selected={isActive}
       onClick={onClick}
       className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-colors duration-150 relative"
-      style={{ color: isActive ? '#dc2626' : '#525252', backgroundColor: 'transparent' }}
+      style={{ color: isActive ? '#dc2626' : '#9ca3af', backgroundColor: 'transparent' }}
     >
       <span className="relative">
         {icon}

@@ -5,16 +5,16 @@ import { bjjTerms, BJJTerm } from '@/lib/bjjTerms';
 
 // Category badge colors
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
-  'Positions': { bg: '#1e3a5f', text: '#93c5fd' },
-  'Guards': { bg: '#1a3a1a', text: '#86efac' },
-  'Submissions': { bg: '#3d1a1a', text: '#fca5a5' },
-  'Sweeps': { bg: '#3d2e1a', text: '#fdba74' },
-  'Escapes & Movements': { bg: '#2a1a3d', text: '#c4b5fd' },
-  'Concepts': { bg: '#1a3a3a', text: '#67e8f9' },
+  'Positions': { bg: '#dbeafe', text: '#1d4ed8' },
+  'Guards': { bg: '#dcfce7', text: '#15803d' },
+  'Submissions': { bg: '#fee2e2', text: '#b91c1c' },
+  'Sweeps': { bg: '#ffedd5', text: '#c2410c' },
+  'Escapes & Movements': { bg: '#ede9fe', text: '#6d28d9' },
+  'Concepts': { bg: '#cffafe', text: '#0e7490' },
 };
 
 function CategoryBadge({ category }: { category: string }) {
-  const colors = CATEGORY_COLORS[category] ?? { bg: '#262626', text: '#a3a3a3' };
+  const colors = CATEGORY_COLORS[category] ?? { bg: '#f0f0f0', text: '#6b7280' };
   return (
     <span
       className="inline-block px-2 py-0.5 rounded text-xs font-semibold"
@@ -30,7 +30,7 @@ function TermCard({ term, isOpen, onToggle }: { term: BJJTerm; isOpen: boolean; 
   return (
     <div
       className="rounded-lg border flex flex-col overflow-hidden cursor-pointer transition-colors duration-150"
-      style={{ backgroundColor: '#141414', borderColor: isOpen ? '#dc2626' : '#262626' }}
+      style={{ backgroundColor: '#ffffff', borderColor: isOpen ? '#dc2626' : '#e5e5e5', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
       onClick={onToggle}
     >
       {/* Card header — always visible */}
@@ -42,7 +42,7 @@ function TermCard({ term, isOpen, onToggle }: { term: BJJTerm; isOpen: boolean; 
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="w-4 h-4 flex-shrink-0 mt-0.5 transition-transform duration-200"
-            style={{ color: '#525252', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            style={{ color: '#9ca3af', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -55,16 +55,16 @@ function TermCard({ term, isOpen, onToggle }: { term: BJJTerm; isOpen: boolean; 
       {isOpen && (
         <div
           className="px-3 pb-3 flex flex-col gap-3 border-t"
-          style={{ borderColor: '#262626' }}
+          style={{ borderColor: '#e5e5e5' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="text-xs leading-relaxed pt-3" style={{ color: '#a3a3a3' }}>
+          <p className="text-xs leading-relaxed pt-3" style={{ color: '#6b7280' }}>
             {term.definition}
           </p>
 
           {term.videos.length > 0 && (
             <div className="flex flex-col gap-2">
-              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#525252' }}>
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>
                 Watch on YouTube
               </p>
               {term.videos.map((v) => (
@@ -74,7 +74,7 @@ function TermCard({ term, isOpen, onToggle }: { term: BJJTerm; isOpen: boolean; 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 rounded-lg px-3 py-2 transition-opacity duration-150 hover:opacity-80"
-                  style={{ backgroundColor: '#1f1f1f', border: '1px solid #3f3f3f' }}
+                  style={{ backgroundColor: '#f0f0f0', border: '1px solid #d1d5db' }}
                 >
                   {/* Play icon */}
                   <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full" style={{ backgroundColor: '#dc2626' }}>
@@ -82,9 +82,9 @@ function TermCard({ term, isOpen, onToggle }: { term: BJJTerm; isOpen: boolean; 
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   </span>
-                  <span className="text-xs font-medium" style={{ color: '#f5f5f5' }}>{v.label}</span>
+                  <span className="text-xs font-medium" style={{ color: '#111111' }}>{v.label}</span>
                   {/* External link icon */}
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 ml-auto flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="#525252" strokeWidth={2}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 ml-auto flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
                 </a>
@@ -117,14 +117,14 @@ function GlossarySection() {
 
   return (
     <div>
-      <h2 className="text-lg font-bold mb-4 tracking-wide uppercase" style={{ color: '#f5f5f5' }}>
+      <h2 className="text-lg font-bold mb-4 tracking-wide uppercase" style={{ color: '#111111' }}>
         BJJ Glossary
       </h2>
 
       {/* Search */}
       <div className="relative mb-5">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#525252" strokeWidth={2}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
           </svg>
         </span>
@@ -135,16 +135,16 @@ function GlossarySection() {
           onChange={(e) => { setQuery(e.target.value); setOpenTerm(null); }}
           className="w-full rounded-lg pl-9 pr-4 py-2.5 outline-none border transition-colors duration-150"
           style={{
-            backgroundColor: '#141414',
-            borderColor: query ? '#dc2626' : '#262626',
-            color: '#f5f5f5',
+            backgroundColor: '#ffffff',
+            borderColor: query ? '#dc2626' : '#d1d5db',
+            color: '#111111',
             fontSize: 16,
           }}
         />
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-center py-8" style={{ color: '#a3a3a3' }}>
+        <p className="text-sm text-center py-8" style={{ color: '#6b7280' }}>
           No terms match &ldquo;{query}&rdquo;
         </p>
       ) : (
@@ -245,11 +245,11 @@ function ChatSection() {
       >
         {messages.length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center h-full py-10 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke="#525252" strokeWidth={1.5} aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" strokeWidth={1.5} aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
             </svg>
-            <p className="text-sm font-semibold mb-1" style={{ color: '#f5f5f5' }}>Ask your coach anything</p>
-            <p className="text-xs" style={{ color: '#525252' }}>Techniques, escapes, positions, game plans…</p>
+            <p className="text-sm font-semibold mb-1" style={{ color: '#111111' }}>Ask your coach anything</p>
+            <p className="text-xs" style={{ color: '#9ca3af' }}>Techniques, escapes, positions, game plans…</p>
           </div>
         )}
 
@@ -261,7 +261,7 @@ function ChatSection() {
                 fontSize: 15,
                 ...(msg.role === 'user'
                   ? { backgroundColor: '#dc2626', color: '#fff', borderBottomRightRadius: 4 }
-                  : { backgroundColor: '#1f1f1f', color: '#f5f5f5', borderBottomLeftRadius: 4 }),
+                  : { backgroundColor: '#f0f0f0', color: '#111111', borderBottomLeftRadius: 4 }),
               }}
             >
               {msg.content}
@@ -273,14 +273,14 @@ function ChatSection() {
           <div className="flex justify-start">
             <div
               className="rounded-2xl px-4 py-3 flex gap-1 items-center"
-              style={{ backgroundColor: '#1f1f1f', borderBottomLeftRadius: 4 }}
+              style={{ backgroundColor: '#f0f0f0', borderBottomLeftRadius: 4 }}
               aria-label="Coach is typing"
             >
               {[0, 1, 2].map((dot) => (
                 <span
                   key={dot}
                   className="inline-block w-2 h-2 rounded-full"
-                  style={{ backgroundColor: '#525252', animation: `chatBounce 1s infinite ${dot * 0.2}s` }}
+                  style={{ backgroundColor: '#9ca3af', animation: `chatBounce 1s infinite ${dot * 0.2}s` }}
                 />
               ))}
             </div>
@@ -291,7 +291,7 @@ function ChatSection() {
       {/* Input bar */}
       <div
         className="border-t p-3 flex gap-2 items-end"
-        style={{ borderColor: '#262626', backgroundColor: '#141414' }}
+        style={{ borderColor: '#e5e5e5', backgroundColor: '#ffffff' }}
       >
         <textarea
           ref={inputRef}
@@ -306,9 +306,9 @@ function ChatSection() {
           placeholder="Ask about a technique, position, escape…"
           className="flex-1 resize-none rounded-lg px-3 py-2 outline-none border transition-colors duration-150 overflow-hidden"
           style={{
-            backgroundColor: '#0a0a0a',
-            borderColor: input ? '#dc2626' : '#3f3f3f',
-            color: '#f5f5f5',
+            backgroundColor: '#ffffff',
+            borderColor: input ? '#dc2626' : '#d1d5db',
+            color: '#111111',
             fontSize: 16,
             minHeight: 40,
             maxHeight: 120,
@@ -336,20 +336,20 @@ function ChatSection() {
       {isMaximized && (
         <div
           className="fixed inset-0 flex flex-col z-50"
-          style={{ backgroundColor: '#0a0a0a' }}
+          style={{ backgroundColor: '#f5f5f5' }}
         >
           {/* Overlay header */}
           <div
             className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0"
-            style={{ borderColor: '#262626', backgroundColor: '#141414' }}
+            style={{ borderColor: '#e5e5e5', backgroundColor: '#ffffff' }}
           >
-            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#f5f5f5' }}>
+            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#111111' }}>
               Ask the Coach
             </span>
             <button
               onClick={() => setIsMaximized(false)}
               className="p-2 rounded-lg transition-colors duration-150"
-              style={{ color: '#a3a3a3' }}
+              style={{ color: '#6b7280' }}
               aria-label="Minimize chat"
             >
               {/* Compress/minimize icon */}
@@ -365,29 +365,29 @@ function ChatSection() {
       {/* Inline section (always rendered to preserve state) */}
       <div className="mt-10">
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
-          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#a3a3a3' }}>
+          <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#6b7280' }}>
             Ask the Coach
           </span>
-          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
+          <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
         </div>
 
         <div
           className="rounded-lg border overflow-hidden flex flex-col"
-          style={{ backgroundColor: '#0f0f0f', borderColor: '#262626', height: 420 }}
+          style={{ backgroundColor: '#f0f0f0', borderColor: '#e5e5e5', height: 420, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
         >
           {/* Chat header with maximize button */}
           <div
             className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0"
-            style={{ borderColor: '#262626', backgroundColor: '#141414' }}
+            style={{ borderColor: '#e5e5e5', backgroundColor: '#ffffff' }}
           >
-            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#a3a3a3' }}>
+            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#6b7280' }}>
               {messages.length > 0 ? `${messages.filter(m => m.role === 'user').length} question${messages.filter(m => m.role === 'user').length !== 1 ? 's' : ''}` : 'Chat'}
             </span>
             <button
               onClick={() => setIsMaximized(true)}
               className="p-1.5 rounded transition-colors duration-150"
-              style={{ color: '#a3a3a3' }}
+              style={{ color: '#6b7280' }}
               aria-label="Maximize chat"
             >
               {/* Expand icon */}
