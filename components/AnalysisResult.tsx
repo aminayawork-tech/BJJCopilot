@@ -85,14 +85,14 @@ export default function AnalysisResult({ analysis, onReset, onSave, savedConfirm
     <div className="flex flex-col gap-6">
       {/* Section heading */}
       <div className="flex items-center gap-3">
-        <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
+        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
         <span
           className="text-xs font-bold tracking-widest uppercase"
-          style={{ color: '#6b7280' }}
+          style={{ color: '#a3a3a3' }}
         >
           Coach&apos;s Breakdown
         </span>
-        <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
+        <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
       </div>
 
       {hasStructuredContent ? (
@@ -110,12 +110,12 @@ export default function AnalysisResult({ analysis, onReset, onSave, savedConfirm
           {quickWins.length > 0 && (
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 mt-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#b45309" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#ca8a04" aria-hidden="true">
                   <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
                 </svg>
                 <span
                   className="text-xs font-bold tracking-widest uppercase"
-                  style={{ color: '#b45309' }}
+                  style={{ color: '#ca8a04' }}
                 >
                   Quick Wins
                 </span>
@@ -130,11 +130,11 @@ export default function AnalysisResult({ analysis, onReset, onSave, savedConfirm
         /* Fallback: raw text */
         <div
           className="rounded-lg border p-5"
-          style={{ backgroundColor: '#ffffff', borderColor: '#e5e5e5', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+          style={{ backgroundColor: '#141414', borderColor: '#262626' }}
         >
           <pre
             className="text-sm whitespace-pre-wrap leading-relaxed"
-            style={{ color: '#111111', fontFamily: 'inherit' }}
+            style={{ color: '#f5f5f5', fontFamily: 'inherit' }}
           >
             {analysis}
           </pre>
@@ -142,7 +142,7 @@ export default function AnalysisResult({ analysis, onReset, onSave, savedConfirm
       )}
 
       {/* Divider */}
-      <div className="h-px" style={{ backgroundColor: '#e5e5e5' }} />
+      <div className="h-px" style={{ backgroundColor: '#262626' }} />
 
       {/* Save Review button */}
       {onSave && (
@@ -152,7 +152,7 @@ export default function AnalysisResult({ analysis, onReset, onSave, savedConfirm
           className="w-full py-3 rounded-lg font-bold text-sm tracking-widest uppercase transition-all duration-150 border"
           style={
             isSaved
-              ? { backgroundColor: 'transparent', borderColor: '#d1d5db', color: '#9ca3af', cursor: 'default' }
+              ? { backgroundColor: 'transparent', borderColor: '#3f3f3f', color: '#525252', cursor: 'default' }
               : { backgroundColor: 'transparent', borderColor: '#dc2626', color: '#dc2626' }
           }
         >
@@ -231,8 +231,8 @@ function ReviewChat({ analysis }: { analysis: string }) {
     <>
       {messages.length === 0 && !isLoading && (
         <div className="flex flex-col items-center justify-center h-full text-center gap-2">
-          <p className="text-sm font-semibold" style={{ color: '#111111' }}>Ask about your roll</p>
-          <p className="text-xs" style={{ color: '#9ca3af' }}>
+          <p className="text-sm font-semibold" style={{ color: '#f5f5f5' }}>Ask about your roll</p>
+          <p className="text-xs" style={{ color: '#525252' }}>
             "Why did I lose that position?" · "How do I drill the seatbelt?" · "What's the escape from that spot?"
           </p>
         </div>
@@ -245,7 +245,7 @@ function ReviewChat({ analysis }: { analysis: string }) {
               fontSize: 15,
               ...(msg.role === 'user'
                 ? { backgroundColor: '#dc2626', color: '#fff', borderBottomRightRadius: 4 }
-                : { backgroundColor: '#f0f0f0', color: '#111111', borderBottomLeftRadius: 4 }),
+                : { backgroundColor: '#1f1f1f', color: '#f5f5f5', borderBottomLeftRadius: 4 }),
             }}
           >
             {msg.content}
@@ -254,9 +254,9 @@ function ReviewChat({ analysis }: { analysis: string }) {
       ))}
       {isLoading && (
         <div className="flex justify-start">
-          <div className="rounded-2xl px-4 py-3 flex gap-1 items-center" style={{ backgroundColor: '#f0f0f0', borderBottomLeftRadius: 4 }}>
+          <div className="rounded-2xl px-4 py-3 flex gap-1 items-center" style={{ backgroundColor: '#1f1f1f', borderBottomLeftRadius: 4 }}>
             {[0, 1, 2].map((d) => (
-              <span key={d} className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#9ca3af', animation: `reviewBounce 1s infinite ${d * 0.2}s` }} />
+              <span key={d} className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: '#525252', animation: `reviewBounce 1s infinite ${d * 0.2}s` }} />
             ))}
           </div>
         </div>
@@ -265,7 +265,7 @@ function ReviewChat({ analysis }: { analysis: string }) {
   );
 
   const inputBar = (
-    <div className="border-t p-3 flex gap-2 items-end" style={{ borderColor: '#e5e5e5', backgroundColor: '#ffffff' }}>
+    <div className="border-t p-3 flex gap-2 items-end" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
       <textarea
         ref={inputRef}
         rows={1}
@@ -274,7 +274,7 @@ function ReviewChat({ analysis }: { analysis: string }) {
             onKeyDown={onKeyDown}
             placeholder="Ask about this roll…"
             className="flex-1 resize-none rounded-lg px-3 py-2 outline-none border transition-colors duration-150 overflow-hidden"
-            style={{ backgroundColor: '#ffffff', borderColor: input ? '#dc2626' : '#d1d5db', color: '#111111', fontSize: 16, minHeight: 40, maxHeight: 100 }}
+            style={{ backgroundColor: '#0a0a0a', borderColor: input ? '#dc2626' : '#3f3f3f', color: '#f5f5f5', fontSize: 16, minHeight: 40, maxHeight: 100 }}
             disabled={isLoading}
           />
           <button onClick={send} disabled={!input.trim() || isLoading}
@@ -291,10 +291,10 @@ function ReviewChat({ analysis }: { analysis: string }) {
     <>
       {/* Maximized overlay */}
       {isMaximized && (
-        <div className="fixed inset-0 flex flex-col z-50" style={{ backgroundColor: '#f5f5f5' }}>
-          <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0" style={{ borderColor: '#e5e5e5', backgroundColor: '#ffffff' }}>
-            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#111111' }}>Discuss This Roll</span>
-            <button onClick={() => setIsMaximized(false)} className="p-2 rounded-lg" style={{ color: '#6b7280' }} aria-label="Minimize">
+        <div className="fixed inset-0 flex flex-col z-50" style={{ backgroundColor: '#0a0a0a' }}>
+          <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
+            <span className="text-sm font-bold tracking-widest uppercase" style={{ color: '#f5f5f5' }}>Discuss This Roll</span>
+            <button onClick={() => setIsMaximized(false)} className="p-2 rounded-lg" style={{ color: '#a3a3a3' }} aria-label="Minimize">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15v4.5M15 15h4.5M15 15l5.25 5.25M9 15H4.5M9 15v4.5M9 15l-5.25 5.25" />
               </svg>
@@ -310,18 +310,18 @@ function ReviewChat({ analysis }: { analysis: string }) {
       {/* Inline section */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
-          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#6b7280' }}>Discuss This Roll</span>
-          <div className="h-px flex-1" style={{ backgroundColor: '#e5e5e5' }} />
+          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#a3a3a3' }}>Discuss This Roll</span>
+          <div className="h-px flex-1" style={{ backgroundColor: '#262626' }} />
         </div>
 
-        <div className="rounded-lg border flex flex-col overflow-hidden" style={{ backgroundColor: '#f0f0f0', borderColor: '#e5e5e5', height: 360, boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+        <div className="rounded-lg border flex flex-col overflow-hidden" style={{ backgroundColor: '#0f0f0f', borderColor: '#262626', height: 360 }}>
           {/* Header with maximize */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0" style={{ borderColor: '#e5e5e5', backgroundColor: '#ffffff' }}>
-            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#6b7280' }}>
+          <div className="flex items-center justify-between px-4 py-2.5 border-b flex-shrink-0" style={{ borderColor: '#262626', backgroundColor: '#141414' }}>
+            <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: '#a3a3a3' }}>
               {messages.filter(m => m.role === 'user').length > 0 ? `${messages.filter(m => m.role === 'user').length} question${messages.filter(m => m.role === 'user').length !== 1 ? 's' : ''}` : 'Chat'}
             </span>
-            <button onClick={() => setIsMaximized(true)} className="p-1.5 rounded" style={{ color: '#6b7280' }} aria-label="Maximize chat">
+            <button onClick={() => setIsMaximized(true)} className="p-1.5 rounded" style={{ color: '#a3a3a3' }} aria-label="Maximize chat">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
               </svg>
@@ -353,12 +353,12 @@ function BulletCard({
   bullet: ParsedBullet;
   isQuickWin?: boolean;
 }) {
-  const accentColor = isQuickWin ? '#b45309' : '#dc2626';
+  const accentColor = isQuickWin ? '#ca8a04' : '#dc2626';
 
   return (
     <div
       className="rounded-lg border overflow-hidden"
-      style={{ backgroundColor: '#ffffff', borderColor: '#e5e5e5', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+      style={{ backgroundColor: '#141414', borderColor: '#262626' }}
     >
       <div className="flex">
         {/* Left accent bar */}
@@ -380,7 +380,7 @@ function BulletCard({
 
           {/* Body */}
           {bullet.body && (
-            <p className="text-sm leading-relaxed" style={{ color: '#374151' }}>
+            <p className="text-sm leading-relaxed" style={{ color: '#d4d4d4' }}>
               {bullet.body}
             </p>
           )}

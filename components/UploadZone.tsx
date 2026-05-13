@@ -191,33 +191,33 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 cursor-pointer transition-all duration-200 select-none"
-          style={{ backgroundColor: isDragging ? '#e5e5e5' : '#ffffff', borderColor: isDragging ? '#dc2626' : '#e5e5e5', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+          style={{ backgroundColor: isDragging ? '#1a1a1a' : '#141414', borderColor: isDragging ? '#dc2626' : '#262626' }}
           aria-label="Upload zone — click or drag and drop a BJJ image or video"
         >
           <div className="flex items-center gap-4 mb-5" aria-hidden="true">
             {/* Photo icon */}
-            <div className="flex items-center justify-center w-14 h-14 rounded-full" style={{ backgroundColor: '#f0f0f0' }}>
+            <div className="flex items-center justify-center w-14 h-14 rounded-full" style={{ backgroundColor: '#1f1f1f' }}>
               <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="#dc2626" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 20.25h18A2.25 2.25 0 0023.25 18V6A2.25 2.25 0 0021 3.75H3A2.25 2.25 0 00.75 6v12A2.25 2.25 0 003 20.25z" />
               </svg>
             </div>
-            <span style={{ color: '#9ca3af', fontSize: '1.25rem' }}>|</span>
+            <span style={{ color: '#525252', fontSize: '1.25rem' }}>|</span>
             {/* Video icon */}
-            <div className="flex items-center justify-center w-14 h-14 rounded-full" style={{ backgroundColor: '#f0f0f0' }}>
+            <div className="flex items-center justify-center w-14 h-14 rounded-full" style={{ backgroundColor: '#1f1f1f' }}>
               <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="#dc2626" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0013.5 5.25h-9A2.25 2.25 0 002.25 7.5v9A2.25 2.25 0 004.5 18.75z" />
               </svg>
             </div>
           </div>
 
-          <p className="text-base font-semibold mb-1" style={{ color: '#111111' }}>
+          <p className="text-base font-semibold mb-1" style={{ color: '#f5f5f5' }}>
             Drop your BJJ photo or video here
           </p>
-          <p className="text-sm" style={{ color: '#6b7280' }}>
+          <p className="text-sm" style={{ color: '#a3a3a3' }}>
             or{' '}
             <span className="font-medium" style={{ color: '#dc2626' }}>click to browse</span>
           </p>
-          <p className="text-xs mt-3" style={{ color: '#9ca3af' }}>
+          <p className="text-xs mt-3" style={{ color: '#525252' }}>
             Images: JPEG, PNG, WEBP &nbsp;·&nbsp; Video: MP4, MOV, WEBM &nbsp;·&nbsp; max 100MB
           </p>
 
@@ -232,9 +232,9 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
           />
         </div>
       ) : (
-        <div className="rounded-xl border overflow-hidden" style={{ backgroundColor: '#ffffff', borderColor: '#e5e5e5', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+        <div className="rounded-xl border overflow-hidden" style={{ backgroundColor: '#141414', borderColor: '#262626' }}>
           {/* Preview */}
-          <div className="relative w-full" style={{ maxHeight: '320px', overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
+          <div className="relative w-full" style={{ maxHeight: '320px', overflow: 'hidden', backgroundColor: '#0a0a0a' }}>
             {fileIsVideo ? (
               <video
                 src={previewUrl!}
@@ -262,9 +262,9 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
           </div>
 
           {/* File info row */}
-          <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: '#e5e5e5' }}>
+          <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: '#262626' }}>
             <div className="flex items-center gap-3 min-w-0">
-              <div className="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: '#f0f0f0' }} aria-hidden="true">
+              <div className="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: '#1f1f1f' }} aria-hidden="true">
                 {fileIsVideo ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#dc2626" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0013.5 5.25h-9A2.25 2.25 0 002.25 7.5v9A2.25 2.25 0 004.5 18.75z" />
@@ -276,16 +276,16 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium truncate" style={{ color: '#111111' }} title={selectedFile.name}>
+                <p className="text-sm font-medium truncate" style={{ color: '#f5f5f5' }} title={selectedFile.name}>
                   {selectedFile.name}
                 </p>
-                <p className="text-xs" style={{ color: '#6b7280' }}>{formatFileSize(selectedFile.size)}</p>
+                <p className="text-xs" style={{ color: '#a3a3a3' }}>{formatFileSize(selectedFile.size)}</p>
               </div>
             </div>
             <button
               onClick={handleRemoveFile}
               className="flex-shrink-0 ml-3 p-1.5 rounded transition-colors duration-150"
-              style={{ color: '#6b7280' }}
+              style={{ color: '#a3a3a3' }}
               aria-label="Remove selected file"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -298,8 +298,8 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
 
       {/* Who are you selector — shown once a file is picked */}
       {selectedFile && (
-        <div className="rounded-xl border p-4 flex flex-col gap-3" style={{ backgroundColor: '#ffffff', borderColor: '#e5e5e5', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
-          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#6b7280' }}>
+        <div className="rounded-xl border p-4 flex flex-col gap-3" style={{ backgroundColor: '#141414', borderColor: '#262626' }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#a3a3a3' }}>
             Which person are you?
           </p>
           <div className="flex flex-wrap gap-2">
@@ -312,9 +312,9 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
                   onClick={() => { setSelectedChip(active ? '' : chip.value); setCustomDescription(''); }}
                   className="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150"
                   style={{
-                    backgroundColor: active ? '#dc2626' : '#f0f0f0',
-                    borderColor: active ? '#dc2626' : '#d1d5db',
-                    color: active ? '#fff' : '#6b7280',
+                    backgroundColor: active ? '#dc2626' : '#1f1f1f',
+                    borderColor: active ? '#dc2626' : '#3f3f3f',
+                    color: active ? '#fff' : '#a3a3a3',
                   }}
                 >
                   {chip.label}
@@ -329,14 +329,14 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
             onChange={(e) => { setCustomDescription(e.target.value); if (e.target.value) setSelectedChip(''); }}
             className="w-full rounded-lg px-3 py-2 text-sm outline-none border transition-colors duration-150"
             style={{
-              backgroundColor: '#ffffff',
-              borderColor: customDescription ? '#dc2626' : '#d1d5db',
-              color: '#111111',
+              backgroundColor: '#0a0a0a',
+              borderColor: customDescription ? '#dc2626' : '#3f3f3f',
+              color: '#f5f5f5',
               fontSize: 16,
             }}
           />
           {!userDescription && (
-            <p className="text-xs" style={{ color: '#9ca3af' }}>
+            <p className="text-xs" style={{ color: '#525252' }}>
               Skipping this — AI will make its best guess
             </p>
           )}
@@ -357,12 +357,12 @@ export default function UploadZone({ onAnalyze }: UploadZoneProps) {
       </button>
 
       {selectedFile && fileIsVideo && !isExtracting && (
-        <p className="text-xs text-center" style={{ color: '#9ca3af' }}>
+        <p className="text-xs text-center" style={{ color: '#525252' }}>
           {NUM_FRAMES} frames will be extracted evenly across your clip
         </p>
       )}
       {(!selectedFile || !fileIsVideo) && !isExtracting && (
-        <p className="text-xs text-center" style={{ color: '#9ca3af' }}>
+        <p className="text-xs text-center" style={{ color: '#525252' }}>
           Upload a photo or video clip from your training footage
         </p>
       )}

@@ -24,11 +24,11 @@ export default function LoadingState() {
       <div className="flex flex-col items-center gap-1">
         <p
           className="text-base font-bold tracking-widest uppercase"
-          style={{ color: '#111111' }}
+          style={{ color: '#f5f5f5' }}
         >
           Analyzing your roll...
         </p>
-        <p className="text-sm" style={{ color: '#6b7280' }}>
+        <p className="text-sm" style={{ color: '#a3a3a3' }}>
           Your black-belt coach is reviewing the footage
         </p>
       </div>
@@ -40,22 +40,21 @@ export default function LoadingState() {
             key={i}
             className="rounded-lg border overflow-hidden animate-pulse"
             style={{
-              backgroundColor: '#ffffff',
-              borderColor: '#e5e5e5',
+              backgroundColor: '#141414',
+              borderColor: '#262626',
               opacity: 1 - (i - 1) * 0.2,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
             }}
           >
             <div className="flex">
-              <div className="w-1 flex-shrink-0" style={{ backgroundColor: '#d1d5db' }} />
+              <div className="w-1 flex-shrink-0" style={{ backgroundColor: '#3f3f3f' }} />
               <div className="flex-1 px-4 py-3 flex flex-col gap-2">
                 <div
                   className="h-3 rounded"
-                  style={{ backgroundColor: '#e5e5e5', width: `${60 - i * 8}%` }}
+                  style={{ backgroundColor: '#262626', width: `${60 - i * 8}%` }}
                 />
                 <div
                   className="h-3 rounded"
-                  style={{ backgroundColor: '#f0f0f0', width: `${90 - i * 5}%` }}
+                  style={{ backgroundColor: '#1f1f1f', width: `${90 - i * 5}%` }}
                 />
               </div>
             </div>
